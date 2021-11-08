@@ -9,6 +9,12 @@ import {variance} from "./data/stats_helpers.js";
  */
 export function getSum(array) {
 
+    function add(acc, a){
+        return acc + a;
+    }
+
+    var sum = array.reduce(add,0);
+    return sum;
 }
 
 
@@ -22,6 +28,16 @@ export function getSum(array) {
  * console.log(getMedian(array)); // 4.5
  */
 export function getMedian(array) {
+
+    array.sort(function(a,b){return a-b});
+
+    var halfway = Math.floor(array.length/2);
+
+    if(array.length % 2){
+        return array[halfway];
+    }else{
+        return (array[halfway-1]+array[halfway]) / 2.0;
+    }
 
 }
 
@@ -45,6 +61,20 @@ export function getMedian(array) {
  }
  */
 export function getStatistics(array) {
+
+
+    var stats = {
+        length: array.length,
+        sum: getSum(array),
+        mean: getSum(array)/array.length,
+        median: getMedian(array),
+        min: Math.min(...array),
+        max: Math.max(...array),
+        variance: variance(array, getSum(array)/array.length),
+        standard_deviation: Math.sqrt(variance(array, getSum(array)/array.length))
+    }
+
+    return stats;
 
 }
 

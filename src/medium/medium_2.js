@@ -20,10 +20,14 @@ see under the methods section
  * @param {allCarStats.ratioHybrids} ratio of cars that are hybrids
  */
 export const allCarStats = {
-    avgMpg: undefined,
-    allYearStats: undefined,
-    ratioHybrids: undefined,
+    avgMpg: {
+        "city": getStatistics(mpg_data.map(x => x.city_mpg)).mean,
+        "highway": getStatistics(mpg_data.map(x => x.highway_mpg)).mean 
+    },
+    allYearStats: getStatistics(mpg_data.map(x => x.year)),
+    ratioHybrids: mpg_data.map(x => x.hybrid).filter(Boolean).length / mpg_data.length
 };
+
 
 
 /**
@@ -83,7 +87,38 @@ export const allCarStats = {
  *
  * }
  */
+
+
+
 export const moreStats = {
-    makerHybrids: undefined,
-    avgMpgByYearAndHybrid: undefined
+    makerHybrids: mpg_data.reduce((acc,val)=>{
+        if(acc.findIndex(item=>item.make === val.make) === -1){
+            let hybrids = mpg_data.filter(car=>car.make === val.make).filter(car=>car.hybrid === true).map(item=>item.id);
+
+            if(hybrids.length>0){
+                acc.push({"make": val.make, hybrids})
+            }
+
+        }
+        return acc;
+    },[]).sort((a,b)=>{return b.hybrids.length - a.hybrids.length;}),
+
+    avgMpgByYearAndHybrid: mpg_data.reduce((acc, val)=>{
+        if(!(val.year in acc)){
+            let hybrid_data = mpg_data.filter(car=>car.year === val.year).filter(car=>car.hybrid === true);
+            let notHybrid_data = mpg_data.filter(car=>car.year === val.year).filter(car=>car.hybrid === false);
+
+             acc[val.year] = {
+                 hybrid: {
+                     city: getStatistics(hybrid_data.map(car => car.city_mpg)).mean,
+                     highway: getStatistics(hybrid_data.map(car => car.highway_mpg)).mean
+                 },
+                 notHybrid: {
+                    city: getStatistics(notHybrid_data.map(car => car.city_mpg)).mean,
+                    highway: getStatistics(notHybrid_data.map(car => car.highway_mpg)).mean
+                }             }
+        }
+        return acc;
+    },{})
+
 };
